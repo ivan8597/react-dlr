@@ -1,0 +1,72 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  min-height: 100vh; /* Полная высота экрана */
+  display: flex;
+  justify-content: center; /* Центрирование по горизонтали */
+  align-items: center; /* Центрирование по вертикали */
+  padding: 16px; /* Отступы */
+  background-color: #f3f4f6; /* Светлый фон */
+}
+
+.chat-container {
+  width: 100%;
+  max-width: 672px; /* Максимальная ширина чата (аналог max-w-2xl) */
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень */
+  border-radius: 8px; /* Скругленные углы */
+  padding: 24px; /* Внутренние отступы */
+}
+
+.chat-box {
+  height: 24rem; /* 384px, аналог h-96 */
+  overflow-y: auto;
+  border: 1px solid #d1d5db; /* Серый бордер */
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #f9fafb; /* Светло-серый фон */
+  border-radius: 4px;
+}
+
+select, input, button {
+  padding: 8px;
+  border-radius: 4px;
+}
+
+select, input {
+  border: 1px solid #d1d5db;
+}
+
+button {
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.flex {
+  display: flex;
+  gap: 8px; /* Промежуток между элементами */
+}
+
+.bg-blue-500 { background-color: #3b82f6; }
+.bg-red-500 { background-color: #ef4444; }
+.bg-green-500 { background-color: #10b981; }
+.bg-gray-500 { background-color: #6b7280; }
+.hover\:bg-blue-600:hover { background-color: #2563eb; }
+.hover\:bg-red-600:hover { background-color: #dc2626; }
+.hover\:bg-green-600:hover { background-color: #059669; }
+.hover\:bg-gray-600:hover { background-color: #4b5563; }
+
+.text-2xl { font-size: 1.5rem; }
+.font-bold { font-weight: 700; }
+.mb-4 { margin-bottom: 16px; }
+.max-w-full { max-width: 100%; }
+.text-gray-500 { color: #6b7280; }
