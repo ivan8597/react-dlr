@@ -53,6 +53,7 @@ Backend
   - клонировать репозиторий
   - npm install - установка зависимостей
   - docker compose up --build - запуск приложения
+  - http://localhost:3000/ - переход на страницу приложения
   - docker compose down - остановка приложения
 
   
