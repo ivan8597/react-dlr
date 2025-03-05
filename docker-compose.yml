@@ -1,0 +1,39 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    volumes:
+      - ./audio:/app/audio
+
+  backend:
+    build: ./backend
+    depends_on:
+      - postgres
+    volumes:
+      - ./audio:/app/audio
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=your_password
+      - DB_NAME=chat_app
+      - DB_PORT=5432
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: chat_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+volumes:
+  audio:
+  postgres_data:

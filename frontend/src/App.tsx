@@ -22,22 +22,27 @@ interface ClientToServerEvents {
   'typing': () => void;
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:4000');
+// Подключаемся к бэкенду через Nginx
+const socket = io('http://localhost', {
+  path: '/socket.io/',
+  transports: ['websocket', 'polling'], // Разрешаем оба транспорта
+  upgrade: true // Разрешаем upgrade до websocket
+});
 
 const useSocket = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState<string | null>(null);
 
   useEffect(() => {
-    socket.on('chat history', (history) => {
-      setMessages(history.reverse().filter(msg => msg.text || msg.audio));
+    socket.on('chat history', (history: Message[]) => {
+      setMessages(history.reverse().filter((msg: Message) => msg.text || msg.audio));
     });
-    socket.on('chat message', (msg) => {
+    socket.on('chat message', (msg: Message) => {
       if (msg.text || msg.audio) {
         setMessages((prev) => [...prev, msg]);
       }
     });
-    socket.on('typing', (userId) => {
+    socket.on('typing', (userId: string) => {
       setIsTyping(userId);
       setTimeout(() => setIsTyping(null), 2000);
     });
@@ -98,7 +103,7 @@ const App: React.FC = () => {
           stream.getTracks().forEach(track => track.stop());
         };
 
-        mediaRecorder.start(1000); // Запись кусками по 1 сек для надежности
+        mediaRecorder.start(1000);
         console.log('Запись началась');
       })
       .catch((err) => {
@@ -137,15 +142,12 @@ const App: React.FC = () => {
           <option value="fr">French</option>
           <option value="ru">Русский</option>
         </select>
-        <div
-          ref={chatBoxRef}
-          className="chat-box"
-        >
+        <div ref={chatBoxRef} className="chat-box">
           {messages.map((msg) => (
             <div key={msg.id} className="mb-2">
               {msg.audio ? (
                 <div>
-                  <audio controls src={`http://localhost:4000${msg.audio}`} className="max-w-full" />
+                  <audio controls src={msg.audio} className="max-w-full" />
                   <small className="text-gray-500">({msg.lang})</small>
                 </div>
               ) : (
@@ -161,9 +163,7 @@ const App: React.FC = () => {
               )}
             </div>
           ))}
-          {isTyping && (
-            <p className="text-gray-400 italic">Кто-то печатает...</p>
-          )}
+          {isTyping && <p className="text-gray-400 italic">Кто-то печатает...</p>}
         </div>
         <div className="flex">
           <input
@@ -179,10 +179,7 @@ const App: React.FC = () => {
             className="flex-1"
             placeholder="Введите сообщение..."
           />
-          <button
-            onClick={sendMessage}
-            className="bg-blue-500 hover:bg-blue-600"
-          >
+          <button onClick={sendMessage} className="bg-blue-500 hover:bg-blue-600">
             Отправить
           </button>
           <button
@@ -191,10 +188,7 @@ const App: React.FC = () => {
           >
             {isRecording ? 'Остановить' : 'Записать'}
           </button>
-          <button
-            onClick={clearChat}
-            className="bg-gray-500 hover:bg-gray-600"
-          >
+          <button onClick={clearChat} className="bg-gray-500 hover:bg-gray-600">
             Очистить
           </button>
         </div>

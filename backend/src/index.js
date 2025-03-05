@@ -11,17 +11,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
 const server = createServer(app);
 const io = new Server(server, {
-  cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] },
+  cors: { 
+    origin: 'http://localhost', // Указываем фронтенд через Nginx
+    methods: ['GET', 'POST'],
+    credentials: true
+  },
+  path: '/socket.io/', // Указываем путь для Socket.IO
+  transports: ['websocket', 'polling']
 });
 
-app.use('/audio', express.static(path.join(__dirname, 'audio')));
+app.use('/audio', express.static('/app/audio')); // Путь в контейнере
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'chat_app',
-  password: 'your_password',
-  port: 5432,
+  user: process.env.DB_USER || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  database: process.env.DB_NAME || 'chat_app',
+  password: process.env.DB_PASSWORD || 'your_password',
+  port: process.env.DB_PORT || 5432,
 });
 
 export const mockTranslate = (text, targetLang) => {
@@ -56,10 +62,9 @@ export const saveAudio = async (audioBuffer) => {
     throw new Error('Audio buffer is empty or invalid');
   }
   const fileName = `audio_${Date.now()}.webm`;
-  const filePath = path.join(__dirname, 'audio', fileName);
-  await fs.mkdir(path.join(__dirname, 'audio'), { recursive: true });
+  const filePath = path.join('/app/audio', fileName);
+  await fs.mkdir('/app/audio', { recursive: true });
   await fs.writeFile(filePath, Buffer.from(audioBuffer));
-  console.log('Audio saved at:', filePath);
   return `/audio/${fileName}`;
 };
 
@@ -107,7 +112,6 @@ export const setupSocketIO = (ioInstance, dbPool = pool) => {
   });
 };
 
-// Запускаем сервер только если файл вызван напрямую
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   setupSocketIO(io);
   server.listen(4000, () => {
